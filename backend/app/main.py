@@ -41,6 +41,15 @@ def create_app() -> FastAPI:
     app.include_router(webhook_router)  # bypass Clerk auth middleware
 
     # ─── Health Check ───────────────────────────────────────
+    @app.get("/", tags=["General"])
+    def root():
+        """Welcome endpoint to verify the server is active."""
+        return {
+            "message": f"Welcome to {settings.APP_NAME} API",
+            "docs": "/docs",
+            "status": "active"
+        }
+
     @app.get("/health", tags=["Health"])
     def health_check():
         """Quick endpoint to verify the server is running."""
