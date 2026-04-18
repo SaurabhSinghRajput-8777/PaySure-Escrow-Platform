@@ -9,9 +9,12 @@ from app.api.v1.disputes import router as disputes_router
 from app.api.v1.messages import router as messages_router
 from app.api.v1.ratings import router as ratings_router
 from app.api.v1.admin import router as admin_router
-from app.api.v1.chat_ws import router as chat_ws_router
 from app.api.v1.wallet import router as wallet_router
 from app.api.v1.applications import router as applications_router
+from app.api.v1.pusher_auth import router as pusher_auth_router
+# NOTE: chat_ws (WebSocket) has been removed — real-time is now handled
+# by Pusher Channels.  Clients subscribe via pusher-js; the backend
+# fires events through pusher_service.trigger_new_message().
 
 # Master v1 router — all routes prefixed with /api/v1
 api_router = APIRouter(prefix="/api/v1")
@@ -25,6 +28,6 @@ api_router.include_router(disputes_router)
 api_router.include_router(messages_router)
 api_router.include_router(ratings_router)
 api_router.include_router(admin_router)
-api_router.include_router(chat_ws_router)
 api_router.include_router(wallet_router)
 api_router.include_router(applications_router)
+api_router.include_router(pusher_auth_router)

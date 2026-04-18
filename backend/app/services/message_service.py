@@ -8,7 +8,8 @@ from app.schemas.message import MessageCreate, MessageResponse
 
 def send_message(db: Session, data: MessageCreate, sender_id: uuid.UUID) -> Message:
     """
-    Stores a new message in the DB.
+    Stores a new message in the DB, then broadcasts it via Pusher Channels
+    so all connected frontend clients receive it in real-time without polling.
     Verifies the sender is a participant in this invoice (client or freelancer).
     """
     from app.models.invoice import Invoice
@@ -34,7 +35,21 @@ def send_message(db: Session, data: MessageCreate, sender_id: uuid.UUID) -> Mess
     db.add(message)
     db.commit()
     db.refresh(message)
+
+    # ── Broadcast via Pusher Channels ─────────────────────────────────────────
+    # This fires a "new-message" event on "private-chat-<invoice_id>".
+    # The try/except ensures a Pusher outage never breaks the HTTP response —
+    # the message is already safely persisted to DB above.
+    try:
+        from app.services.pusher_service import trigger_new_message
+        enriched = enrich_message_response(message)
+        trigger_new_message(str(data.invoice_id), enriched.model_dump(mode="json"))
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning(f"Pusher broadcast failed: {exc}")
+
     return message
+
 
 
 def get_messages_for_invoice(

@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     RESEND_API_KEY: str = ""
     FRONTEND_URL: str = "http://localhost:5173"  # for email deep links
 
+    # ─── Pusher Channels (Real-time Chat) ───────────────────
+    PUSHER_APP_ID: str = ""
+    PUSHER_KEY: str = ""
+    PUSHER_SECRET: str = ""
+    PUSHER_CLUSTER: str = "ap2"     # Asia Pacific — change if your app is elsewhere
+
     # ─── CORS ───────────────────────────────────────────────
     ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
