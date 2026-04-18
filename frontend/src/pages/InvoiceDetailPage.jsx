@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/react';
-import { useWebSocketChat } from '../hooks/useWebSocketChat';
+import { usePusherChat } from '../hooks/usePusherChat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, RefreshCw, CheckCircle, XCircle, Clock, Lock, Send,
@@ -471,7 +471,7 @@ export default function InvoiceDetailPage() {
   }, [activeTab, profile, fetchMyApplication]);
 
   // ── WebSocket chat ──
-  const { connected: chatConnected, sendMessage: wsSendMessage } = useWebSocketChat(id, {
+  const { connected: chatConnected } = usePusherChat(id, {
     enabled: activeTab === 'chat' && !!profile,
     getToken,
     onMessage: (msg) => setMessages(prev => [...prev, msg]),
@@ -575,8 +575,17 @@ export default function InvoiceDetailPage() {
   const handleSendChat = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
-    wsSendMessage(chatInput.trim());
+    const content = chatInput.trim();
     setChatInput('');
+    try {
+      await apiFetch('/messages/', {
+        getToken,
+        method: 'POST',
+        body: { invoice_id: id, content }
+      });
+    } catch (err) {
+      alert(`Chat error: ${err.message}`);
+    }
   };
 
   // ── Loading / Error ──
