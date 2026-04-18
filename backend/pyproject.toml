@@ -11,8 +11,10 @@ authors = [
     { name = "Krishna Gaur", email = "s24cseu0659@bennett.edu.in" },
 ]
 requires-python = ">=3.13"
-readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
 
 [tool.pytest.ini_options]
 # Tells pytest where to find tests and sets async mode
